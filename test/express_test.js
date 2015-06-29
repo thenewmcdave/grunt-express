@@ -8,7 +8,7 @@ var http = require('http');
 var helper = require('./helper');
 var fixtures = path.join(__dirname, 'fixtures');
 
-var useFixtures = ['defaults', 'statics', 'express', 'serverrl'];
+var useFixtures = ['defaults', 'statics', 'express', 'serverrl', 'serveruse'];
 
 function cleanUp() {
   useFixtures.forEach(function (fixture) {
@@ -109,6 +109,27 @@ exports.simple = {
     assertExpress(null,
       function (result) {
         helper.verboseLog(result);
+        test.ok(result.match(/Path: \/test/gm).length === 1, 'Express server should work');
+        test.done();
+      });
+  },
+
+  serveruse: function (test) {
+    test.expect(2);
+
+    var cwd = path.resolve(fixtures, 'serveruse');
+    var assertExpress = helper.assertTask([
+      'express:useserver',
+      'request:http://localhost:3000/test'
+    ], {
+      cwd: cwd
+    });
+
+    assertExpress(null,
+      function (result) {
+        console.log("serveruse result=",result)
+        helper.verboseLog("result=",result);
+        test.ok(result, 'server.use shouls work');
         test.ok(result.match(/Path: \/test/gm).length === 1, 'Express server should work');
         test.done();
       });
